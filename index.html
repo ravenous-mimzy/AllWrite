@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Writer's Suite</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- Home Screen -->
+    <div id="home-container"></div>
+
+    <!-- Main App (hidden until project is loaded) -->
+    <div id="app-container" style="display: none;">
+      <!-- Navigation sidebar -->
+      <nav id="navigation">
+        <h2>Writer's Suite</h2>
+        <button class="nav-button" id="nav-home" data-section="home">Home</button>
+        <hr style="border: none; border-top: 1px solid #34495e; margin: 15px 0;" />
+        <div id="nav-sections"></div>
+      </nav>
+
+      <!-- Main content area -->
+      <div id="content-area">
+        <div id="writing-section" class="section">
+          <div class="layout-container"></div>
+        </div>
+        <div id="plotting-section" class="section">
+          <div class="layout-container"></div>
+        </div>
+        <div id="characters-section" class="section">
+          <div class="layout-container"></div>
+        </div>
+        <div id="worldbuilding-section" class="section">
+          <div class="layout-container"></div>
+        </div>
+        <div id="research-section" class="section">
+          <div class="layout-container"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="projectManager.js"></script>
+    <script src="characterManager.js"></script>
+    <script src="characterListView.js"></script>
+    <script src="characterEditorPanel.js"></script>
+    <script src="characterCardView.js"></script>
+    <script src="characterImportanceView.js"></script>
+    <script src="homeScreen.js"></script>
+    <script src="panelSystem.js"></script>
+    <script src="setupDialog.js"></script>
+    <script src="textInputDialog.js"></script>
+    <script src="layouts.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
