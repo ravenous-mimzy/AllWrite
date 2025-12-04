@@ -32,7 +32,7 @@ class TextInputDialog {
       input.type = 'text';
       input.className = 'text-input-dialog-input';
       input.placeholder = this.placeholder;
-      input.focus();
+      input.autofocus = true;
 
       // Button container
       const buttonContainer = document.createElement('div');
@@ -74,8 +74,22 @@ class TextInputDialog {
       dialog.appendChild(buttonContainer);
       overlay.appendChild(dialog);
 
-      // Add to page
+      // Add to page and focus input after paint to ensure typing works
       document.body.appendChild(overlay);
+      requestAnimationFrame(() => {
+        try { input.focus(); } catch (_) {}
+        // Place caret at end for convenience
+        const val = input.value; input.value = ''; input.value = val;
+      });
+
+      // Basic Esc to cancel
+      overlay.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          e.stopPropagation();
+          overlay.remove();
+          resolve(null);
+        }
+      });
     });
   }
 }

@@ -68,6 +68,8 @@ class App {
     
     homeContainer.innerHTML = '';
     appContainer.style.display = 'none';
+    // Ensure home screen is visible after returning from app
+    homeContainer.style.display = 'block';
 
     const homeScreen = new HomeScreen(this.projectManager, (action) => this.handleHomeAction(action));
     homeContainer.appendChild(homeScreen.render());
@@ -202,6 +204,17 @@ class App {
   goHome() {
     this.isProjectLoaded = false;
     this.saveProjectState();
+    this.showHomeScreen();
+  }
+
+  /**
+   * Placeholder for future project-specific home navigation.
+   * Once implemented, this should take the user to the selected project's
+   * dedicated home/dashboard screen instead of the global project picker.
+   */
+  goProjectHome() {
+    // TODO: Implement project-specific home/dashboard view.
+    // For now, fall back to global home (project selection).
     this.showHomeScreen();
   }
 
@@ -477,8 +490,8 @@ class App {
     dialog.show().then((name) => {
       if (!name) return;
       
-      // Create character with default flag
-      const character = this.characterManager.createCharacter(name, 'Primary');
+      // Create character with default flag (normalized id)
+      const character = this.characterManager.createCharacter(name, 'primary');
       console.log('New character created:', character);
       
       // Refresh current view to show new character

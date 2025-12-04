@@ -181,7 +181,8 @@ class CharacterEditorPanel {
 
     const updates = {
       name: form.querySelector('input[name="name"]')?.value || '',
-      flagId: form.querySelector('select[name="flagId"]')?.value || 'Primary',
+      // Fallback to a valid lowercase id if select not found
+      flagId: form.querySelector('select[name="flagId"]')?.value || 'primary',
       data: {
         gender: form.querySelector('input[name="gender"]')?.value || '',
         age: form.querySelector('input[name="age"]')?.value || '',
