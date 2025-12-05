@@ -211,6 +211,7 @@ body {
   border: 1px solid #bdc3c7;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   pointer-events: auto;
+  z-index: 1; /* Keep editor underneath list header/filter */
 }
 
 .panel-header {
@@ -274,6 +275,28 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
+}
+
+/* Ensure list header/filter stay above editor panel */
+#character-list {
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.character-list-header,
+.character-search-bar,
+.character-view-switcher,
+.character-filter-bar {
+  position: relative;
+  z-index: 2;
+  background: #fff;
+}
+
+/* Slight right padding so content doesn't touch editor boundary */
+.character-filter-bar {
+  padding-right: 12px;
+  row-gap: 8px;
 }
 
 /* Setup Dialog Styles */
@@ -500,6 +523,7 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
+  flex-wrap: wrap;
 }
 
 .character-filter-label {

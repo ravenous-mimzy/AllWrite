@@ -381,11 +381,20 @@ class App {
 
     // Add window resize listener to adjust layout on resize
     window.removeEventListener('resize', window.onWindowResize);
-    window.onWindowResize = () => {
+    // Debounce helper to avoid excessive recalculations
+    const debounce = (fn, delay) => {
+      let t;
+      return (...args) => {
+        clearTimeout(t);
+        t = setTimeout(() => fn(...args), delay);
+      };
+    };
+
+    window.onWindowResize = debounce(() => {
       const currentView = window.currentCharacterView || 'list';
       const editorVisible = window.characterEditorPanel && window.characterEditorPanel.style.display !== 'none';
       this.adjustCharacterPanelLayout(editorVisible);
-    };
+    }, 150);
     window.addEventListener('resize', window.onWindowResize);
   }
 
@@ -447,29 +456,57 @@ class App {
     const listPanel = document.getElementById('character-list');
     const editorPanel = document.getElementById('character-editor');
     const container = document.querySelector('#characters-section .layout-container');
+    const headerBar = document.querySelector('#character-list .character-filter-bar');
     
     if (!listPanel || !container) return;
 
     const containerWidth = container.offsetWidth;
     const containerHeight = container.offsetHeight;
+    const currentView = window.currentCharacterView || 'list';
+    const headerHeight = headerBar ? headerBar.offsetHeight : 0;
+    
+    // Clamp helper
+    const clamp = (val, min, max) => Math.max(min, Math.min(max, val));
     
     console.log(`Adjusting layout: containerWidth=${containerWidth}, editorVisible=${editorVisible}`);
 
     if (editorVisible && editorPanel) {
-      // Calculate widths to fit window: list (35%) + gap (10px) + editor (65%)
-      const listWidth = Math.floor(containerWidth * 0.35);
-      const editorWidth = containerWidth - listWidth - 10; // 10px gap
+      // View-aware editor width cap
+      const maxEditorPct = currentView === 'importance' ? 0.65 : 0.70;
+      const minEditorPx = 320;
+      const gapPx = 10;
+
+      // Base split
+      let listWidth = Math.floor(containerWidth * (1 - maxEditorPct));
+      let editorWidth = containerWidth - listWidth - gapPx;
+
+      // Ensure editor stays within bounds
+      editorWidth = clamp(editorWidth, minEditorPx, Math.floor(containerWidth * maxEditorPct));
+      // Recompute list to honor gap and clamped editor
+      listWidth = clamp(containerWidth - editorWidth - gapPx, 280, containerWidth);
 
       listPanel.style.left = '0px';
       listPanel.style.top = '0px';
       listPanel.style.width = listWidth + 'px';
       listPanel.style.height = containerHeight + 'px';
 
-      editorPanel.style.left = (listWidth + 10) + 'px';
+      editorPanel.style.left = (listWidth + gapPx) + 'px';
       editorPanel.style.top = '0px';
       editorPanel.style.width = editorWidth + 'px';
       editorPanel.style.height = containerHeight + 'px';
       
+      // Add a small right-side buffer to list when header is tall (wrapped)
+      if (headerHeight > 32) {
+        listPanel.style.paddingRight = '8px';
+      } else {
+        listPanel.style.paddingRight = '0px';
+      }
+
+      // Guarantee header has enough height for two rows when editor is visible
+      if (headerBar) {
+        headerBar.style.minHeight = headerHeight > 32 ? headerHeight + 'px' : '32px';
+      }
+
       console.log(`Editor visible: list=${listWidth}px, editor=${editorWidth}px`);
     } else {
       // List takes full width
@@ -477,6 +514,8 @@ class App {
       listPanel.style.top = '0px';
       listPanel.style.width = containerWidth + 'px';
       listPanel.style.height = containerHeight + 'px';
+      listPanel.style.paddingRight = '0px';
+      if (headerBar) headerBar.style.minHeight = '32px';
       
       console.log(`Editor hidden: list=${containerWidth}px`);
     }
