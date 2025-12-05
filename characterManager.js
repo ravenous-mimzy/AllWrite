@@ -11,6 +11,22 @@ class CharacterManager {
   }
 
   /**
+   * Normalizes various flag id inputs to the canonical lowercase ids
+   */
+  normalizeFlagId(flagId) {
+    if (!flagId) return 'secondary';
+    const map = {
+      Primary: 'primary',
+      primary: 'primary',
+      Secondary: 'secondary',
+      secondary: 'secondary',
+      Tertiary: 'tertiary',
+      tertiary: 'tertiary'
+    };
+    return map[flagId] || flagId;
+  }
+
+  /**
    * Gets predefined importance flags
    * @returns {Array} Array of predefined flags
    */
@@ -55,10 +71,11 @@ class CharacterManager {
    * @returns {Object} The created character
    */
   createCharacter(name, flagId = 'secondary') {
+    const normalizedFlag = this.normalizeFlagId(flagId);
     const character = {
       id: 'char_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
       name: name,
-      flagId: flagId,
+      flagId: normalizedFlag,
       createdAt: new Date().toISOString(),
       lastModified: new Date().toISOString(),
       data: {
@@ -152,7 +169,11 @@ class CharacterManager {
    */
   loadCharacterData(data) {
     if (data && data.characters) {
-      this.characters = data.characters;
+      // Normalize any legacy mixed-case flag ids from saved state
+      this.characters = data.characters.map((c) => ({
+        ...c,
+        flagId: this.normalizeFlagId(c.flagId)
+      }));
     }
     if (data && data.customFlags) {
       this.customFlags = data.customFlags;
